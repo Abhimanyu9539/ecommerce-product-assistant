@@ -1,11 +1,11 @@
 import os
 import sys
-from utils.config_loader import load_config
+from .config_loader import load_config
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_groq import ChatGroq
-from logger import GLOBAL_LOGGER as log
-from exception.custom_exception import ProductAssistantException
+from ..logger import GLOBAL_LOGGER as log
+from ..exception.custom_exception import ProductAssistantException
 import asyncio
 
 

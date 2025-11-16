@@ -2,7 +2,6 @@
 import streamlit as st
 from prod_assistant.etl.data_scrapper import FlipkartScraper
 from prod_assistant.etl.data_ingestion import DataIngestion
-import os
 
 flipkart_scraper = FlipkartScraper()
 output_path = "data/product_reviews.csv"

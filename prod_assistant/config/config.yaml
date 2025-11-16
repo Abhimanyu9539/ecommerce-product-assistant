@@ -3,7 +3,7 @@ astra_db:
 
 embedding_model:
   provider: "openai"
-  model_name: "models/text-embedding-3-small"
+  model_name: "text-embedding-3-small"
 
 retriever:
   top_k: 4
