@@ -31,3 +31,15 @@ dependencies = [
     "undetected-chromedriver==3.5.5",
     "uvicorn==0.35.0",
 ]
+
+
+authors = [{ name = "Abhimanyu" }]
+license = { text = "Proprietary" }
+
+# Optional: CLI command (python -m pip install -e . ke baad yeh create hoga)
+[project.scripts]
+ecomm-assistant = "ecommerce_prod_assistant.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["prod_assistant"]
+include = ["ecommerce_prod_assistant*"]

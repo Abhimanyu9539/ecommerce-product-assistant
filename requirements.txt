@@ -22,3 +22,5 @@ mcp
 ddgs==9.6.0
 langchain-openai
 langchain-community
+
+-e .

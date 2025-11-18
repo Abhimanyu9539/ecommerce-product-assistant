@@ -6,7 +6,7 @@ embedding_model:
   model_name: "text-embedding-3-small"
 
 retriever:
-  top_k: 4
+  top_k: 3
 
 llm:
   groq:
