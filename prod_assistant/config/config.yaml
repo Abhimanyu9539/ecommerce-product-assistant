@@ -9,7 +9,7 @@ retriever:
   top_k: 3
 
 llm:
-  groq:
+  openai:
     provider: "openai"
     model_name: "gpt-4o-mini"
     temperature: 0
