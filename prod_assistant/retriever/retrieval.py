@@ -77,7 +77,7 @@ class Retriever:
                 base_retriever=mmr_retriever
             )
             print("Retriever loaded successfully")
-            return self.retriever
+        return self.retriever
 
     def call_retriever(self, query):
         """

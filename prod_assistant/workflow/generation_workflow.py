@@ -4,6 +4,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from prompt_library.prompts import PROMPT_REGISTRY, PromptType
 from retriever.retrieval import Retriever
 from utils.model_loader import ModelLoader
+from evaluations.ragas_eval import evaluate_context_precision, evaluate_response_relevancy
 retriever_obj = Retriever()
 model_loader = ModelLoader()
 
@@ -22,9 +23,12 @@ def format_docs(docs) -> str:
         )
         formatted_chunks.append(formatted)
     return "\n\n---\n\n".join(formatted_chunks)
-def build_chain():
+def build_chain(query: str):
     """Build the RAG pipeline chain with retriever, prompt, LLM, and parser."""
     retriever = retriever_obj.load_retriever()
+    retrieved_docs=retriever.invoke(query)
+    retrieved_contexts = [format_docs(doc) for doc in retrieved_docs]
+    
     llm = model_loader.load_llm()
     prompt = ChatPromptTemplate.from_template(
         PROMPT_REGISTRY[PromptType.PRODUCT_BOT].template
@@ -35,22 +39,29 @@ def build_chain():
         | llm
         | StrOutputParser()
     )
-    return chain
-def invoke_chain(query: str, debug: bool = False) -> str:
+    return chain, retrieved_contexts
+
+def invoke_chain(query: str, debug: bool = False):
     """Run the chain with a user query."""
-    chain = build_chain()
+    chain,retrieved_contexts = build_chain(query)
+
     if debug:
         # For debugging: show docs retrieved before passing to LLM
         docs = retriever_obj.load_retriever().invoke(query)
         print("\nRetrieved Documents:")
         print(format_docs(docs))
         print("\n---\n")
-    return chain.invoke(query)
+    
+    response = chain.invoke(query)
+    return retrieved_contexts,response
+
 if __name__ == "__main__":
-    try:
-        answer = invoke_chain("can you tell me the price of the iPhone 15?")
-        print("\n Assistant Answer:\n", answer)
-    except Exception as e:
-        import traceback
-        print("Exception occurred:", str(e))
-        traceback.print_exc()
+    user_query = "Can you suggest good budget iPhone under 1,00,000 INR?"
+    retrieved_contexts,response = invoke_chain(user_query)
+    
+    context_score = evaluate_context_precision(user_query,response,retrieved_contexts)
+    relevancy_score = evaluate_response_relevancy(user_query,response,retrieved_contexts)
+    
+    print("\n--- Evaluation Metrics ---")
+    print("Context Precision Score:", context_score)
+    print("Response Relevancy Score:", relevancy_score)
