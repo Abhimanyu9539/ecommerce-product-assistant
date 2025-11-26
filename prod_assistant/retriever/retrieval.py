@@ -61,21 +61,19 @@ class Retriever:
             
         if not self.retriever:
             top_k = self.config["retriever"]["top_k"] if "retriever" in self.config else 3
-            mmr_retriever = self.vstore.as_retriever(
-                search_kwargs={"k": top_k, 
-                               "fetch_k": 20, 
-                               "score_threshold":0.3, 
-                               "lambda_mult": 0.7 },
+            self.retriever = self.vstore.as_retriever(
+                search_kwargs={"k": top_k
+                               },
                 search_type="mmr",
             )
 
-            llm = self.model_loader.load_llm()
+            # llm = self.model_loader.load_llm()
 
-            compressor = LLMChainFilter.from_llm(llm=llm)
-            self.retriever = ContextualCompressionRetriever(
-                base_compressor=compressor,
-                base_retriever=mmr_retriever
-            )
+            # compressor = LLMChainFilter.from_llm(llm=llm)
+            # self.retriever = ContextualCompressionRetriever(
+            #     base_compressor=compressor,
+            #     base_retriever=mmr_retriever
+            # )
             print("Retriever loaded successfully")
         return self.retriever
 
@@ -95,7 +93,7 @@ class Retriever:
 
     
 if __name__ == "__main__":
-    user_query = "Can you tell me Samsung Galaxy S24?"
+    user_query = "Can you tell me samsung Galaxy S25 Ultra 5G price?"
     retriever_obj  =  Retriever()
     retrieved_docs = retriever_obj.call_retriever(user_query)
 

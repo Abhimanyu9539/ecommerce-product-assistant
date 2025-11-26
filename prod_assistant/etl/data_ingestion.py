@@ -1,11 +1,44 @@
 import os
+import re
+import math
 import pandas as pd
 from dotenv import load_dotenv
 from typing import List
 from langchain_core.documents import Document
 from langchain_astradb import AstraDBVectorStore
-from prod_assistant.utils.model_loader import ModelLoader
-from prod_assistant.utils.config_loader import load_config
+from utils.model_loader import ModelLoader
+from utils.config_loader import load_config
+
+
+# =========================
+# ADDED: Data safety helpers
+# =========================
+
+def safe_float(value):
+    try:
+        v = float(value)
+        if math.isnan(v) or math.isinf(v):
+            return None
+        return v
+    except:
+        return None
+
+
+def safe_int(value):
+    try:
+        if isinstance(value, str):
+            value = value.replace(",", "")
+        return int(value)
+    except:
+        return None
+
+
+def parse_price(value):
+    if not isinstance(value, str):
+        return None
+    digits = re.sub(r"[^\d]", "", value)
+    return int(digits) if digits else None
+
 
 class DataIngestion:
     """
@@ -17,37 +50,40 @@ class DataIngestion:
         Initialize environment variables, embedding model, and set CSV file path.
         """
         print("Initializing DataIngestion pipeline...")
-        self.model_loader=ModelLoader()
+        self.model_loader = ModelLoader()
         self._load_env_variables()
         self.csv_path = self._get_csv_path()
         self.product_data = self._load_csv()
-        self.config=load_config()
+        self.config = load_config()
 
     def _load_env_variables(self):
         """
         Load and validate required environment variables.
         """
         load_dotenv()
-        
-        required_vars = ["OPENAI_API_KEY", "ASTRA_DB_API_ENDPOINT", "ASTRA_DB_APPLICATION_TOKEN", "ASTRA_DB_KEYSPACE"]
-        
+
+        required_vars = [
+            "OPENAI_API_KEY",
+            "ASTRA_DB_API_ENDPOINT",
+            "ASTRA_DB_APPLICATION_TOKEN",
+            "ASTRA_DB_KEYSPACE",
+        ]
+
         missing_vars = [var for var in required_vars if os.getenv(var) is None]
         if missing_vars:
             raise EnvironmentError(f"Missing environment variables: {missing_vars}")
-        
+
         self.openai_api_key = os.getenv("OPENAI_API_KEY")
         self.db_api_endpoint = os.getenv("ASTRA_DB_API_ENDPOINT")
         self.db_application_token = os.getenv("ASTRA_DB_APPLICATION_TOKEN")
         self.db_keyspace = os.getenv("ASTRA_DB_KEYSPACE")
-
-       
 
     def _get_csv_path(self):
         """
         Get path to the CSV file located inside 'data' folder.
         """
         current_dir = os.getcwd()
-        csv_path = os.path.join(current_dir,'data', 'product_reviews.csv')
+        csv_path = os.path.join(current_dir, "data", "product_reviews.csv")
 
         if not os.path.exists(csv_path):
             raise FileNotFoundError(f"CSV file not found at: {csv_path}")
@@ -59,7 +95,15 @@ class DataIngestion:
         Load product data from CSV.
         """
         df = pd.read_csv(self.csv_path)
-        expected_columns = {'product_id','product_title', 'rating', 'total_reviews','price', 'top_reviews'}
+
+        expected_columns = {
+            "product_id",
+            "product_title",
+            "rating",
+            "total_reviews",
+            "price",
+            "top_reviews",
+        }
 
         if not expected_columns.issubset(set(df.columns)):
             raise ValueError(f"CSV must contain columns: {expected_columns}")
@@ -70,29 +114,27 @@ class DataIngestion:
         """
         Transform product data into list of LangChain Document objects.
         """
-        product_list = []
+        documents = []
 
         for _, row in self.product_data.iterrows():
-            product_entry = {
-                    "product_id": row["product_id"],
-                    "product_title": row["product_title"],
-                    "rating": row["rating"],
-                    "total_reviews": row["total_reviews"],
-                    "price": row["price"],
-                    "top_reviews": row["top_reviews"]
-                }
-            product_list.append(product_entry)
-
-        documents = []
-        for entry in product_list:
             metadata = {
-                    "product_id": entry["product_id"],
-                    "product_title": entry["product_title"],
-                    "rating": entry["rating"],
-                    "total_reviews": entry["total_reviews"],
-                    "price": entry["price"]
+                "product_id": str(row["product_id"]),
+                "product_title": str(row["product_title"]),
+                "rating": safe_float(row["rating"]),
+                "total_reviews": safe_int(row["total_reviews"]),
+                "price": parse_price(row["price"]),
             }
-            doc = Document(page_content=entry["top_reviews"], metadata=metadata)
+
+            # =========================
+            # ADDED: Remove invalid JSON values
+            # =========================
+            metadata = {k: v for k, v in metadata.items() if v is not None}
+
+            doc = Document(
+                page_content=str(row["top_reviews"]),
+                metadata=metadata,
+            )
+
             documents.append(doc)
 
         print(f"Transformed {len(documents)} documents.")
@@ -102,9 +144,10 @@ class DataIngestion:
         """
         Store documents into AstraDB vector store.
         """
-        collection_name=self.config["astra_db"]["collection_name"]
+        collection_name = self.config["astra_db"]["collection_name"]
+
         vstore = AstraDBVectorStore(
-            embedding= self.model_loader.load_embeddings(),
+            embedding=self.model_loader.load_embeddings(),
             collection_name=collection_name,
             api_endpoint=self.db_api_endpoint,
             token=self.db_application_token,
@@ -113,6 +156,7 @@ class DataIngestion:
 
         inserted_ids = vstore.add_documents(documents)
         print(f"Successfully inserted {len(inserted_ids)} documents into AstraDB.")
+
         return vstore, inserted_ids
 
     def run_pipeline(self):
@@ -122,13 +166,14 @@ class DataIngestion:
         documents = self.transform_data()
         vstore, _ = self.store_in_vector_db(documents)
 
-        #Optionally do a quick search
+        # Optionally do a quick search
         query = "Can you tell me the low budget iphone?"
         results = vstore.similarity_search(query)
 
         print(f"\nSample search results for query: '{query}'")
         for res in results:
             print(f"Content: {res.page_content}\nMetadata: {res.metadata}\n")
+
 
 # Run if this file is executed directly
 if __name__ == "__main__":

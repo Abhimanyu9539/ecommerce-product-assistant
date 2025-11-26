@@ -27,8 +27,9 @@ def build_chain(query: str):
     """Build the RAG pipeline chain with retriever, prompt, LLM, and parser."""
     retriever = retriever_obj.load_retriever()
     retrieved_docs=retriever.invoke(query)
-    retrieved_contexts = [format_docs(doc) for doc in retrieved_docs]
+    retrieved_contexts = [format_docs(retrieved_docs)]
     
+    print("##################",retrieved_contexts)
     llm = model_loader.load_llm()
     prompt = ChatPromptTemplate.from_template(
         PROMPT_REGISTRY[PromptType.PRODUCT_BOT].template
@@ -56,9 +57,9 @@ def invoke_chain(query: str, debug: bool = False):
     return retrieved_contexts,response
 
 if __name__ == "__main__":
-    user_query = "Can you suggest good budget iPhone under 1,00,000 INR?"
+    user_query = "Can you tell me price of samsung Galaxy S25 Ultra 5G?"
     retrieved_contexts,response = invoke_chain(user_query)
-    
+    print(response)
     context_score = evaluate_context_precision(user_query,response,retrieved_contexts)
     relevancy_score = evaluate_response_relevancy(user_query,response,retrieved_contexts)
     
