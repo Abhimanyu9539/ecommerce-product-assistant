@@ -10,7 +10,7 @@ from retriever.retrieval import Retriever
 from utils.model_loader import ModelLoader
 from langgraph.checkpoint.memory import MemorySaver
 import asyncio
-from evaluations.ragas_eval import evaluate_context_precision, evaluate_response_relevancy
+#from evaluations.ragas_eval import evaluate_context_precision, evaluate_response_relevancy
 
 
 class AgenticRAG:

@@ -56,13 +56,13 @@ def invoke_chain(query: str, debug: bool = False):
     response = chain.invoke(query)
     return retrieved_contexts,response
 
-if __name__ == "__main__":
-    user_query = "Can you tell me price of samsung Galaxy S25 Ultra 5G?"
-    retrieved_contexts,response = invoke_chain(user_query)
-    print(response)
-    context_score = evaluate_context_precision(user_query,response,retrieved_contexts)
-    relevancy_score = evaluate_response_relevancy(user_query,response,retrieved_contexts)
+# if __name__ == "__main__":
+#     user_query = "Can you tell me price of samsung Galaxy S25 Ultra 5G?"
+#     retrieved_contexts,response = invoke_chain(user_query)
+#     print(response)
+#     context_score = evaluate_context_precision(user_query,response,retrieved_contexts)
+#     relevancy_score = evaluate_response_relevancy(user_query,response,retrieved_contexts)
     
-    print("\n--- Evaluation Metrics ---")
-    print("Context Precision Score:", context_score)
-    print("Response Relevancy Score:", relevancy_score)
+#     print("\n--- Evaluation Metrics ---")
+#     print("Context Precision Score:", context_score)
+#     print("Response Relevancy Score:", relevancy_score)

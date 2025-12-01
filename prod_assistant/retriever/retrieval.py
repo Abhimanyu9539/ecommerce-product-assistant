@@ -5,7 +5,7 @@ from utils.model_loader import ModelLoader
 from dotenv import load_dotenv  
 from langchain_classic.retrievers.document_compressors import LLMChainFilter
 from langchain_classic.retrievers import ContextualCompressionRetriever
-from evaluations.ragas_eval import evaluate_response_relevancy, evaluate_context_precision
+# from evaluations.ragas_eval import evaluate_response_relevancy, evaluate_context_precision
 
 class Retriever:
     def __init__(self):
@@ -92,34 +92,34 @@ class Retriever:
         return output        
 
     
-if __name__ == "__main__":
-    user_query = "Can you tell me samsung Galaxy S25 Ultra 5G price?"
-    retriever_obj  =  Retriever()
-    retrieved_docs = retriever_obj.call_retriever(user_query)
+# if __name__ == "__main__":
+#     user_query = "Can you tell me samsung Galaxy S25 Ultra 5G price?"
+#     retriever_obj  =  Retriever()
+#     retrieved_docs = retriever_obj.call_retriever(user_query)
 
-    def _format_docs(docs) -> str:
-            if not docs:
-                return "No relevant documents found."
-            formatted_chunks = []
-            for d in docs:
-                meta = d.metadata or {}
-                formatted = (
-                    f"Title: {meta.get('product_title', 'N/A')}\n"
-                    f"Price: {meta.get('price', 'N/A')}\n"
-                    f"Rating: {meta.get('rating', 'N/A')}\n"
-                    f"Reviews:\n{d.page_content.strip()}"
-                )
-                formatted_chunks.append(formatted)
-            return "\n\n---\n\n".join(formatted_chunks)
+#     def _format_docs(docs) -> str:
+#             if not docs:
+#                 return "No relevant documents found."
+#             formatted_chunks = []
+#             for d in docs:
+#                 meta = d.metadata or {}
+#                 formatted = (
+#                     f"Title: {meta.get('product_title', 'N/A')}\n"
+#                     f"Price: {meta.get('price', 'N/A')}\n"
+#                     f"Rating: {meta.get('rating', 'N/A')}\n"
+#                     f"Reviews:\n{d.page_content.strip()}"
+#                 )
+#                 formatted_chunks.append(formatted)
+#             return "\n\n---\n\n".join(formatted_chunks)
         
-    retrieved_contexts = [_format_docs(doc) for doc in retrieved_docs]
+#     retrieved_contexts = [_format_docs(doc) for doc in retrieved_docs]
     
     #this is not an actual output this have been written to test the pipeline
-    response="iphone 16 plus, iphone 16, iphone 15 are best phones under 1,00,000 INR."
+    # response="iphone 16 plus, iphone 16, iphone 15 are best phones under 1,00,000 INR."
     
-    context_score = evaluate_context_precision(user_query,response,retrieved_contexts)
-    relevancy_score = evaluate_response_relevancy(user_query,response,retrieved_contexts)
+    # context_score = evaluate_context_precision(user_query,response,retrieved_contexts)
+    # relevancy_score = evaluate_response_relevancy(user_query,response,retrieved_contexts)
     
-    print("\n--- Evaluation Metrics ---")
-    print("Context Precision Score:", context_score)
-    print("Response Relevancy Score:", relevancy_score)
+    # print("\n--- Evaluation Metrics ---")
+    # print("Context Precision Score:", context_score)
+    # print("Response Relevancy Score:", relevancy_score)

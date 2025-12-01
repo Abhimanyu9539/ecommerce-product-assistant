@@ -6,7 +6,6 @@ from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
 from langgraph.checkpoint.memory import MemorySaver
 from prompt_library.prompts import PROMPT_REGISTRY, PromptType
-from evaluations.ragas_eval import evaluate_context_precision, evaluate_response_relevancy
 from retriever.retrieval import Retriever
 from utils.model_loader import ModelLoader
 

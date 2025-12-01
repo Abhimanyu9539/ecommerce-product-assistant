@@ -24,4 +24,4 @@ langchain-openai
 langchain-community
 ragas
 
-#-e .
+-e .
