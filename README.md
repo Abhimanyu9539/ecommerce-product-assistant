@@ -4,7 +4,7 @@ An intelligent AI-powered assistant designed to help with e-commerce product res
 
 ## 🎥 Demo
 
-<video controls src="walkthrough.mp4" width="100%"></video>
+![Demo Preview](walkthrough.gif)
 
 ## 🚀 Features
 
