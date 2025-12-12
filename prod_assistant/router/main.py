@@ -20,6 +20,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # ---------- FastAPI Endpoints ----------
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
@@ -30,6 +31,6 @@ async def index(request: Request):
 async def chat(msg: str = Form(...)):
     """Call the Agentic RAG workflow."""
     rag_agent = AgenticRAG()
-    answer = rag_agent.run(msg)   # run() already returns final answer string
+    answer = rag_agent.run(msg)  # run() already returns final answer string
     print(f"Agentic Response: {answer}")
     return answer
