@@ -93,6 +93,7 @@ jobs:
         run: |
           kubectl create secret generic product-assistant-secrets \
             --from-literal=OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
+            --from-literal=GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }} \
             --from-literal=ASTRA_DB_API_ENDPOINT=${{ secrets.ASTRA_DB_API_ENDPOINT }} \
             --from-literal=ASTRA_DB_APPLICATION_TOKEN=${{ secrets.ASTRA_DB_APPLICATION_TOKEN }} \
             --from-literal=ASTRA_DB_KEYSPACE=${{ secrets.ASTRA_DB_KEYSPACE }} \
