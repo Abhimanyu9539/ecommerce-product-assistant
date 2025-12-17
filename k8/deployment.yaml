@@ -25,11 +25,11 @@ spec:
             secretKeyRef:
               name: product-assistant-secrets
               key: OPENAI_API_KEY
-        # - name: GOOGLE_API_KEY
-        #   valueFrom:
-        #     secretKeyRef:
-        #       name: product-assistant-secrets
-        #       key: GOOGLE_API_KEY
+        - name: GOOGLE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: product-assistant-secrets
+              key: GOOGLE_API_KEY
         - name: ASTRA_DB_API_ENDPOINT
           valueFrom:
             secretKeyRef:

@@ -12,7 +12,7 @@ import asyncio
 
 
 class ApiKeyManager:
-    REQUIRED_KEYS = [ "OPENAI_API_KEY"]
+    REQUIRED_KEYS = ["GOOGLE_API_KEY", "OPENAI_API_KEY"]
 
     def __init__(self):
         self.api_keys = {}
